@@ -3,15 +3,15 @@ use gilrs::{Axis, Button, Event, EventType, Gilrs};
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::default::Default;
-use wmidi::{Channel, ControlNumber, MidiMessage, Note};
+use wmidi::{Channel, ControlValue, MidiMessage, Note, ControlFunction};
 
 #[derive(Clone, Debug)]
 pub struct Config {
     output_port_name: String,
     output_midi_channel: Channel,
     keys: HashMap<Button, Note>,
-    analog_button_ccs: HashMap<Button, ControlNumber>,
-    axis_ccs: HashMap<Axis, ControlNumber>,
+    analog_button_ccs: HashMap<Button, ControlValue>,
+    axis_ccs: HashMap<Axis, ControlValue>,
 }
 
 impl Default for Config {
@@ -81,7 +81,7 @@ fn main() -> Result<()> {
                     if let Some(cc) = cfg.analog_button_ccs.get(&btn) {
                         let mm = MidiMessage::ControlChange(
                             cfg.output_midi_channel,
-                            *cc,
+                            ControlFunction::from(*cc),
                             abs_float_to_midi(pos),
                         );
                         Some(mm)
@@ -120,7 +120,7 @@ fn main() -> Result<()> {
                     if let Some(cc) = cfg.axis_ccs.get(&ax) {
                         let mm = MidiMessage::ControlChange(
                             cfg.output_midi_channel,
-                            *cc,
+                            ControlFunction::from(*cc),
                             centered_float_to_midi(pos),
                         );
                         Some(mm)
